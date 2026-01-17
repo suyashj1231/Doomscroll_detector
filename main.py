@@ -1,6 +1,7 @@
 import cv2
 import sys
-from ultralytics import YOLO
+from object_detector import ObjectDetector
+from gaze_detector import GazeDetector
 
 def main():
     # Initialize webcam
@@ -10,15 +11,9 @@ def main():
         print("Error: Could not open webcam.")
         sys.exit(1)
 
-    # Initialize YOLOv8 model
-    print("Loading YOLOv8 model...")
-    model = YOLO('yolov8n.pt')
-    print("Model loaded.")
-    
-    # Get class ID for 'cell phone' to optimize inference
-    # COCO dataset has 'cell phone'
-    target_class_ids = [k for k, v in model.names.items() if v == 'cell phone']
-
+    # Initialize Detectors
+    object_detector = ObjectDetector(model_path='yolov8n.pt', target_classes=['cell phone'])
+    gaze_detector = GazeDetector()
 
     print("Webcam started. Press 'q' to quit.")
 
@@ -29,11 +24,13 @@ def main():
             print("Error: Failed to capture image.")
             break
 
-        # Run inference with MPS, filtering specifically for cell phones (faster NMS)
-        # ENABLE TRACKING: persist=True helps maintain ID across frames and smooths detections
-        results = model.track(frame, persist=True, verbose=False, device='mps', classes=target_class_ids)
+        # 1. Gaze Detection (Draws on frame directly)
+        gaze_result = gaze_detector.detect(frame)
+        
+        # 2. Object Detection
+        results = object_detector.detect(frame)
 
-        # Process results
+        # Process Object Results
         for result in results:
             boxes = result.boxes
             for box in boxes:
@@ -47,9 +44,14 @@ def main():
                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
                 cv2.putText(frame, f"Phone #{track_id} {box.conf[0]:.2f}", (x1, y1 - 10), 
                             cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+        
+        # Display Interaction Status
+        status_color = (0, 0, 255) if gaze_result["is_looking_down"] else (0, 255, 0)
+        status_text = "LOOKING DOWN" if gaze_result["is_looking_down"] else "LOOKING UP"
+        cv2.putText(frame, f"Status: {status_text}", (20, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, status_color, 2)
 
         # Display the frame
-        cv2.imshow('Doomscroll Detector - Phase 2', frame)
+        cv2.imshow('Doomscroll Detector - Phase 3', frame)
 
         # Quit on 'q' key
         if cv2.waitKey(1) & 0xFF == ord('q'):
