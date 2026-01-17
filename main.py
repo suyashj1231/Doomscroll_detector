@@ -14,6 +14,11 @@ def main():
     print("Loading YOLOv8 model...")
     model = YOLO('yolov8n.pt')
     print("Model loaded.")
+    
+    # Get class ID for 'cell phone' to optimize inference
+    # COCO dataset has 'cell phone'
+    target_class_ids = [k for k, v in model.names.items() if v == 'cell phone']
+
 
     print("Webcam started. Press 'q' to quit.")
 
@@ -24,25 +29,24 @@ def main():
             print("Error: Failed to capture image.")
             break
 
-        # Run inference
-        results = model(frame, verbose=False)
+        # Run inference with MPS, filtering specifically for cell phones (faster NMS)
+        # ENABLE TRACKING: persist=True helps maintain ID across frames and smooths detections
+        results = model.track(frame, persist=True, verbose=False, device='mps', classes=target_class_ids)
 
         # Process results
         for result in results:
             boxes = result.boxes
             for box in boxes:
-                # Class ID and Check if it's a cell phone
-                cls = int(box.cls[0])
-                class_name = model.names[cls]
+                # Bounding box coordinates
+                x1, y1, x2, y2 = map(int, box.xyxy[0])
                 
-                if class_name == 'cell phone':
-                    # Bounding box coordinates
-                    x1, y1, x2, y2 = map(int, box.xyxy[0])
-                    
-                    # Draw rectangle
-                    cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                    cv2.putText(frame, f"Phone {box.conf[0]:.2f}", (x1, y1 - 10), 
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                # Get Track ID if available
+                track_id = int(box.id[0]) if box.id is not None else 0
+
+                # Draw rectangle
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                cv2.putText(frame, f"Phone #{track_id} {box.conf[0]:.2f}", (x1, y1 - 10), 
+                            cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
 
         # Display the frame
         cv2.imshow('Doomscroll Detector - Phase 2', frame)
