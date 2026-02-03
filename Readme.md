@@ -1,10 +1,10 @@
-# Doomscroll Detector 📱🚫
+# Doomscroll Detector
 
 **Doomscroll Detector** is an intelligent background utility designed to keep you focused and productive. By leveraging real-time computer vision, it detects when your attention drifts from your screen to your phone and vocally reminds you to get back on track.
 
 > "As soon as you stop looking at the screen, we say STOP."
 
-## 🚀 How It Works
+##  How It Works
 
 The application uses your webcam to monitor two key behaviors in real-time:
 1.  **Gaze & Head Pose**: Analyses your face landmarks to determine if you are looking at the monitor or looking down/away.
@@ -12,7 +12,7 @@ The application uses your webcam to monitor two key behaviors in real-time:
 
 If the system detects that your eyes are glued to a phone or your focus has left the primary screen for too long, it triggers an audio alert to break the "doomscrolling" loop.
 
-## 🛠️ Tech Stack
+##  Tech Stack
 
 We have chosen a robust Python-based stack for performance and ease of access to hardware acceleration.
 
@@ -22,7 +22,7 @@ We have chosen a robust Python-based stack for performance and ease of access to
 -   **Object Detection**: [Ultralytics YOLOv8](https://github.com/ultralytics/ultralytics) (State-of-the-art detection for identifying 'cell phone')
 -   **Audio**: `pyttsx3` (Offline Text-to-Speech engine) or `playsound`
 
-## 📋 Features
+##  Features
 
 -   **Real-time Monitoring**: Low-latency video processing.
 -   **Phone Detection**: Identifies when a phone enters the frame and face interaction occurs.
@@ -30,7 +30,7 @@ We have chosen a robust Python-based stack for performance and ease of access to
 -   **Instant Feedback**: Audio cues to interrupt distraction immediately.
 -   **Privacy Focused**: All processing happens locally on your machine. No video is saved or sent to the cloud.
 
-## 🏃 Getting Started
+##  Getting Started
 
 ### Prerequisites
 
@@ -78,10 +78,10 @@ Press `q` to quit the application window.
 -   [ ] **Silent Mode**: Visual notification instead of audio.
 -   [ ] **Pomodoro Integration**: Only run detection during work intervals.
 
-## 🤝 Contributing
+##  Contributing
 
 Contributions are welcome! detection accuracy improvements are always needed.
 
-## 📄 License
+##  License
 
 Distributed under the MIT License.
