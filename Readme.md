@@ -71,7 +71,7 @@ python main.py
 
 Press `q` to quit the application window.
 
-## 🗺️ Roadmap
+##  Roadmap
 
 -   [ ] **Productivity Logging**: Track stats on how often you get distracted per hour.
 -   [ ] **Custom Alerts**: Allow users to record their own "Stop!" messages.
