@@ -4,11 +4,15 @@ Webcam-based focus monitor that notices when you've stopped looking at your scre
 
 ## How it decides you're looking down
 
-**Head pose from six landmarks.** MediaPipe Face Mesh (with `refine_landmarks` for the iris points) gives 478 facial landmarks. Six of them, the nose tip, chin, eye corners and mouth corners, are matched against a generic 3D face model and passed to OpenCV's `solvePnP`. The resulting rotation is decomposed (`Rodrigues` → `RQDecomp3x3`) into pitch, yaw and roll, and a projected nose vector is drawn so you can see the estimate.
+### Head pose from six landmarks
 
-**Iris position for subtle glances.** People often glance down at a phone with their eyes, barely moving their head. So the tracker also measures where the iris sits between the upper and lower eyelid (landmarks 468 and 159/145) as a 0-1 ratio.
+MediaPipe Face Mesh (with `refine_landmarks` for the iris points) gives 478 facial landmarks. Six of them, the nose tip, chin, eye corners and mouth corners, are matched against a generic 3D face model and passed to OpenCV's `solvePnP`. The resulting rotation is decomposed (`Rodrigues` → `RQDecomp3x3`) into pitch, yaw and roll, and a projected nose vector is drawn so you can see the estimate.
 
-**Hybrid rule.**
+### Iris position for subtle glances
+
+People often glance down at a phone with their eyes, barely moving their head. So the tracker also measures where the iris sits between the upper and lower eyelid (landmarks 468 and 159/145) as a 0-1 ratio.
+
+### The rule
 
 | Condition | Verdict |
 |---|---|
@@ -16,7 +20,9 @@ Webcam-based focus monitor that notices when you've stopped looking at your scre
 | Head pitch > 2° **and** iris ratio > 0.55 | looking down (subtle glance) |
 | otherwise | looking at the screen |
 
-**Phone tracking.** Ultralytics YOLOv8n runs in tracking mode (`persist=True`) restricted to the COCO `cell phone` class, so each phone keeps a stable ID across frames. It runs on Apple's Metal backend (`device='mps'`); change `object_detector.py` for CUDA or CPU.
+### Phone tracking
+
+Ultralytics YOLOv8n runs in tracking mode (`persist=True`) restricted to the COCO `cell phone` class, so each phone keeps a stable ID across frames. It runs on Apple's Metal backend (`device='mps'`); change `object_detector.py` for CUDA or CPU.
 
 The overlay shows the live pitch, the iris ratio, tracked phones with their IDs and confidence scores, and a `LOOKING DOWN` / `LOOKING UP` status.
 
